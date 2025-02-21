@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+{% block title %}Dashboard - Expense Tracker{% endblock %}
+{% block content %}
+<header class="header">
+  <h1>Expense Tracker Dashboard</h1>
+</header>
+<section class="filter-section">
+  <button id="openDateModal" class="btn">Select Date Range</button>
+</section>
+{% if chart_labels and chart_labels|length > 0 %}
+<section class="chart-section">
+  <div class="chart-tile" id="inflow-chart">
+    <canvas id="inflowCanvas"></canvas>
+  </div>
+  <div class="chart-tile" id="outflow-chart">
+    <canvas id="outflowCanvas"></canvas>
+  </div>
+</section>
+{% endif %}
+<section class="expenses-section">
+  <h2>Expenses</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Category</th>
+        <th>Amount</th>
+        <th>Currency</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for expense in expenses %}
+      <tr>
+        <td>{{ expense.date }}</td>
+        <td>{{ expense.category }}</td>
+        <td>{{ expense.amount }}</td>
+        <td>{{ expense.currency }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% if chart_labels and chart_labels|length > 0 %}
+<script id="chart-data" type="application/json">
+  {{ {'labels': chart_labels, 'values': chart_values}|tojson }}
+</script>
+<script type="text/javascript">
+  var chartData = JSON.parse(document.getElementById('chart-data').textContent);
+  window.chartLabels = chartData.labels;
+  window.chartValues = chartData.values;
+</script>
+{% endif %}
+
+<!-- Date Modal -->
+<div id="dateModal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="dateModalClose">&times;</span>
+    <form id="dateForm" method="get">
+      <label for="modal-start-date">Start Date:</label>
+      <input type="date" id="modal-start-date" name="start_date">
+      <label for="modal-end-date">End Date:</label>
+      <input type="date" id="modal-end-date" name="end_date">
+      <button type="submit" class="btn">Apply Filter</button>
+    </form>
+  </div>
+</div>
+
+<!-- Chart Modal -->
+<div id="chartModal" class="modal">
+  <div class="modal-content chart-modal-content">
+    <span class="close" id="chartModalClose">&times;</span>
+    <canvas id="enlargedChartCanvas"></canvas>
+  </div>
+</div>
+{% endblock %}
